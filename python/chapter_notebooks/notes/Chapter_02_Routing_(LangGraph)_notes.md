@@ -1,3 +1,5 @@
+> **Note:** Despite its filename, this notebook uses **LangChain**, rather than **LangGraph**. It builds a routing pipeline with LangChain runnable chains; it does not define a LangGraph graph.
+
 # Chapter 02: Routing (LangGraph) — Notes
 
 These notes explain `Chapter_02_Routing_(LangGraph).ipynb` as it exists locally, using OpenAI's `gpt-4.1-mini` and a `.env` file.
@@ -18,6 +20,8 @@ The model performs the classification. The handler functions are simulations: th
 Despite the filename, this notebook uses **LangChain runnable chains**, not an actual LangGraph graph. It does not import LangGraph, define a `StateGraph`, or compile graph nodes and edges. The diagram below describes the program's logical flow.
 
 ## Flow diagram
+
+This diagram follows the LangChain routing pipeline implemented in the notebook.
 
 ```mermaid
 flowchart TD
