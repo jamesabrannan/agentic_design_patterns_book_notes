@@ -8,12 +8,12 @@ These Python/Jupyter materials accompany *Agentic Design Patterns: A Hands-On Gu
 
 Files use chapter numbers and variant names to identify the subject and framework. Several chapters offer different implementations using Google ADK, LangChain, LangGraph, or CrewAI.
 
-This directory contains 58 notebooks with content and no empty placeholder notebooks. Short examples and the two MCP initialization notebooks are retained because they contain example data, code, or companion setup imports.
+This directory contains 56 notebooks with content and no empty placeholder notebooks. Short examples and the two MCP initialization notebooks are retained because they contain example data, code, or companion setup imports.
 
 | Chapter | Topic | Contents and variants |
 | --- | --- | --- |
 | 1 | Prompt chaining | Passing results through successive steps, with a code example and a JSON example. |
-| 2 | Routing | Directing requests to an appropriate handler or model; Google ADK, LangGraph, and OpenRouter variants. |
+| 2 | Routing | Classifying requests and selecting simulated handlers in [Chapter_02_Routing_langchain_openai.ipynb](Chapter_02_Routing_langchain_openai.ipynb), with LangChain and direct OpenAI Python SDK implementations. The Google ADK and OpenRouter examples have been removed. See the [routing notes](notes/Chapter_02_Routing_langchain_openai_notes.md) for explanations. |
 | 3 | Parallelization | Organizing independent work to run concurrently with Google ADK and LangChain. |
 | 4 | Reflection | Reviewing generated work and refining it through feedback; ADK, LangChain, and iterative-loop examples. |
 | 5 | Tool use | Connecting agents to callable functions, code execution, Google Search, and Vertex AI Search; includes CrewAI and LangChain examples. |
