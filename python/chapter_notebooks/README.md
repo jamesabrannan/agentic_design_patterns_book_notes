@@ -8,6 +8,8 @@ These Python/Jupyter materials accompany *Agentic Design Patterns: A Hands-On Gu
 
 Files use chapter numbers and variant names to identify the subject and framework. Several chapters offer different implementations using Google ADK, LangChain, LangGraph, or CrewAI.
 
+This directory contains 58 notebooks with content and no empty placeholder notebooks. Short examples and the two MCP initialization notebooks are retained because they contain example data, code, or companion setup imports.
+
 | Chapter | Topic | Contents and variants |
 | --- | --- | --- |
 | 1 | Prompt chaining | Passing results through successive steps, with a code example and a JSON example. |
