@@ -1,12 +1,12 @@
 # Agentic Design Patterns: Chapter Notebooks
 
-**The notebooks in this directory originated from the GitHub repository [evoiz/Agentic-Design-Patterns](https://github.com/evoiz/Agentic-Design-Patterns). Only notebooks used for this project were retained; this is not a complete copy of the upstream collection. Most of the retained notebooks have been modified from their original versions. This README is based on the upstream README and has been rewritten locally with paraphrased summaries and attribution.**
+**The notebooks in this directory originated from the GitHub repository [evoiz/Agentic-Design-Patterns](https://github.com/evoiz/Agentic-Design-Patterns). Only notebooks used for this project were retained; this is not a complete copy of the upstream collection. Most of the retained notebooks have been modified from their original versions.**
 
-These Python/Jupyter materials accompany *Agentic Design Patterns: A Hands-On Guide to Building Intelligent Systems* by Antonio Gulli. The descriptions below summarize the [upstream README](https://github.com/evoiz/Agentic-Design-Patterns/blob/main/README.md) and the local notebook collection in original wording.
+These Python/Jupyter materials accompany *Agentic Design Patterns: A Hands-On Guide to Building Intelligent Systems* by Antonio Gulli. The descriptions below summarize the local notebook collection.
 
 ## Project direction
 
-This project is a personal study collection focused on understanding the book's patterns through LangChain and OpenAI. The intended final collection will retain the LangChain examples and adapt them to include direct implementations using the official OpenAI Python SDK. Where applicable, the LangChain versions will also use OpenAI models.
+This project is a study collection focused on understanding the book's patterns through LangChain and OpenAI. The intended final collection will retain the LangChain examples and adapt them to include direct implementations using the official OpenAI Python SDK. Where applicable, the LangChain versions will also use OpenAI models.
 
 The paired implementations are intended to make the same pattern easier to follow: first through LangChain's abstractions, then through explicit API calls and ordinary Python control flow. The [Chapter 2 routing notebook](Chapter_02_Routing_langchain_openai.ipynb) already includes both approaches.
 
@@ -59,6 +59,6 @@ The [notes folder](notes/README.md) contains Codex-generated explanations of sel
 
 ## Attribution and license
 
-The [upstream repository's license section](https://github.com/evoiz/Agentic-Design-Patterns#%EF%B8%8F-license) identifies the code examples as MIT licensed and attributes the book to Antonio Gulli. The accompanying [LICENSE](LICENSE) supplies the MIT terms for the code examples, consistent with that declaration and the code-sample license identified in the original manuscript.
+The accompanying [LICENSE](LICENSE) supplies the MIT terms for the code examples.
 
-Retain existing copyright and attribution notices, including those crediting Marco Fago and Mahtab Syed in individual notebooks. The MIT license for code examples does not relicense the book's prose, manuscript, or other separately copyrighted material. This README's summaries are locally written paraphrases of the cited sources.
+Retain existing copyright and attribution notices, including those crediting Marco Fago and Mahtab Syed in individual notebooks. The MIT license for code examples does not relicense the book's prose, manuscript, or other separately copyrighted material.
