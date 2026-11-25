@@ -1,1 +1,8 @@
 /target/
+
+# Eclipse project and workspace files
+.classpath
+.project
+.settings/
+.metadata/
+*.launch
