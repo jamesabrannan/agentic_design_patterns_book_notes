@@ -2,6 +2,8 @@
 
 # Chapter 02: Routing with LangChain and OpenAI — Notes
 
+> **Note:** The “Workflow: Routing” section of Anthropic's [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) explains how requests are classified and directed to specialized handlers, with a diagram, use cases, and examples.
+
 > **Note:** For additional reading, see LangChain's [router pattern documentation for Python](https://docs.langchain.com/oss/python/langchain/multi-agent/router).
 
 These notes explain [Chapter_02_Routing_langchain_openai.ipynb](../Chapter_02_Routing_langchain_openai.ipynb), using OpenAI's `gpt-4.1-mini` and a `.env` file. This is the remaining Chapter 2 notebook; the Google ADK and OpenRouter examples have been removed. The LangChain implementation is explained first, followed by the direct OpenAI Python SDK alternative.
