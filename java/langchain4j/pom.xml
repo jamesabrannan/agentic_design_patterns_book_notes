@@ -1,17 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.jamesabrannan.agenticpatterns</groupId>
+  <parent>
+    <groupId>com.jamesabrannan.agenticpatterns</groupId>
+    <artifactId>agentic-design-patterns</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
   <artifactId>agentic-design-patterns-langchain4j</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>Agentic Design Patterns with LangChain4j</name>
   <description>Java implementations of patterns from Antonio Gulli's
     Agentic Design Patterns using LangChain4j.</description>
   <properties>
-    <maven.compiler.release>17</maven.compiler.release>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <langchain4j.version>1.24.0</langchain4j.version>
     <langchain4j.agentic.version>1.24.0-beta34</langchain4j.agentic.version>
-    <log4j.version>2.26.1</log4j.version>
   </properties>
   <dependencies>
     <dependency>
@@ -47,13 +48,4 @@
       <version>${langchain4j.version}</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.14.1</version>
-      </plugin>
-    </plugins>
-  </build>
 </project>
