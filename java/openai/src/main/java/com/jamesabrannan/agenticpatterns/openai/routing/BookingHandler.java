@@ -1,10 +1,11 @@
 package com.jamesabrannan.agenticpatterns.openai.routing;
 
+import com.jamesabrannan.agenticpatterns.openai.provider.OpenAiTextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Skeleton for handling booking requests in the OpenAI routing example.
+ * Acknowledges travel booking requests using the shared OpenAI text service.
  *
  * @file BookingHandler.java
  * @author James Brannan
@@ -19,10 +20,22 @@ public class BookingHandler implements RequestHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(BookingHandler.class);
 
+    private static final String INSTRUCTIONS = """
+            You are a booking assistant.
+            Acknowledge the user's travel request without asking questions or requesting additional details.
+            Keep your response brief.
+            Do not claim to have booked anything or checked live availability.
+            """;
+
+    private final OpenAiTextService textService;
+
+    public BookingHandler(OpenAiTextService textService) {
+        this.textService = textService;
+    }
+
     @Override
     public String handle(String request) {
-        logger.debug("handle called: requestCharacters={}", request == null ? null : request.length());
-        logger.error("handle is not implemented");
-        throw new UnsupportedOperationException("BookingHandler.handle is not implemented");
+        logger.info("Handling booking request");
+        return textService.generate(INSTRUCTIONS, request);
     }
 }

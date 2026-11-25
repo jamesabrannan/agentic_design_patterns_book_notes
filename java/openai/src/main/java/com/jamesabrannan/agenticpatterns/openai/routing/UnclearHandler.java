@@ -1,10 +1,11 @@
 package com.jamesabrannan.agenticpatterns.openai.routing;
 
+import com.jamesabrannan.agenticpatterns.openai.provider.OpenAiTextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Skeleton for handling unclear requests in the OpenAI routing example.
+ * Acknowledges unclear requests using the shared OpenAI text service.
  *
  * @file UnclearHandler.java
  * @author James Brannan
@@ -19,10 +20,20 @@ public class UnclearHandler implements RequestHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(UnclearHandler.class);
 
+    private static final String INSTRUCTIONS = """
+            Reply only with: Your request was unclear.
+            Do not ask questions or request additional details.
+            """;
+
+    private final OpenAiTextService textService;
+
+    public UnclearHandler(OpenAiTextService textService) {
+        this.textService = textService;
+    }
+
     @Override
     public String handle(String request) {
-        logger.debug("handle called: requestCharacters={}", request == null ? null : request.length());
-        logger.error("handle is not implemented");
-        throw new UnsupportedOperationException("UnclearHandler.handle is not implemented");
+        logger.info("Handling unclear request");
+        return textService.generate(INSTRUCTIONS, request);
     }
 }

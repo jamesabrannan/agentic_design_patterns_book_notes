@@ -1,10 +1,11 @@
 package com.jamesabrannan.agenticpatterns.openai.routing;
 
+import com.jamesabrannan.agenticpatterns.openai.provider.OpenAiTextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Skeleton for handling information requests in the OpenAI routing example.
+ * Answers general information requests using the shared OpenAI text service.
  *
  * @file InfoHandler.java
  * @author James Brannan
@@ -19,10 +20,23 @@ public class InfoHandler implements RequestHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(InfoHandler.class);
 
+    private static final String INSTRUCTIONS = """
+            You are an information assistant.
+            Answer the user's general knowledge question briefly and clearly.
+            Acknowledge uncertainty when you do not know the answer.
+            Do not claim to have searched the web or checked live information.
+            Do not ask questions or request additional details.
+            """;
+
+    private final OpenAiTextService textService;
+
+    public InfoHandler(OpenAiTextService textService) {
+        this.textService = textService;
+    }
+
     @Override
     public String handle(String request) {
-        logger.debug("handle called: requestCharacters={}", request == null ? null : request.length());
-        logger.error("handle is not implemented");
-        throw new UnsupportedOperationException("InfoHandler.handle is not implemented");
+        logger.info("Handling information request");
+        return textService.generate(INSTRUCTIONS, request);
     }
 }
