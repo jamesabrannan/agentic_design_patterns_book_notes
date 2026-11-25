@@ -1,0 +1,481 @@
+{
+  "name": "Routing-Example-Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        -32
+      ],
+      "id": "5159c17a-f23b-4448-8f47-d4b29e9ab224",
+      "name": "Execute Routing Example"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { request: \"Book me a flight to London.\" } },\n  { json: { request: \"What is the capital of Italy?\" } },\n  { json: { request: \"Do that thing for me.\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        -32
+      ],
+      "id": "73271f9d-2c51-4a89-b579-c9963155c0e3",
+      "name": "Requests"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"INSTRUCTIONS\": \"Classify the user's request into exactly one category:\\nBOOKING: Requests related to booking flights or hotels.\\nINFO: General information questions.\\nUNCLEAR: Ambiguous requests or requests outside those categories.\\nReturn only BOOKING, INFO, or UNCLEAR. Do not answer the request itself.\"\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -480,
+        -32
+      ],
+      "id": "bd2df97f-230a-4375-9cc7-76ea55d84045",
+      "name": "Coordinator Instructions"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.request }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "={{ $json.INSTRUCTIONS }}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -240,
+        -32
+      ],
+      "id": "3cc1b354-c127-4f81-a4ff-d54542bc01ff",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        224
+      ],
+      "id": "1e5c7f65-8690-4239-af7b-7e77e6af5f2c",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.text.trim() }}",
+                    "rightValue": "BOOKING",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "59e9b3e6-2f31-464e-a7da-f579b9f4818a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "BOOKING"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "70cea7c7-1ee1-4e9f-b79c-76b6e1908377",
+                    "leftValue": "={{ $json.text.trim() }}",
+                    "rightValue": "INFO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "INFO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "65138a24-56d1-42cb-9923-f690ca93db4d",
+                    "leftValue": "={{ $json.text.trim() }}",
+                    "rightValue": "UNCLEAR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "UNCLEAR"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.5,
+      "position": [
+        128,
+        -48
+      ],
+      "id": "0757fa2b-c91e-44e7-9248-96ae21b05bf5",
+      "name": "Route by Request Category"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.request }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "={{ $json.handlerInstructions }}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        960,
+        -32
+      ],
+      "id": "88de532c-5901-49a5-b93d-c2c00ff3541f",
+      "name": "Handle Request"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        960,
+        224
+      ],
+      "id": "3ceb05e2-e48b-405f-83ac-371c0d1c7388",
+      "name": "OpenAI Chat Model1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ JSON.stringify({ request: $(\"Coordinator Instructions\").item.json.request, category: $json.text.trim(), handlerInstructions: \"You are a booking assistant. Acknowledge the user's travel request briefly. Do not ask questions or request additional details. Do not claim to have booked anything or checked live availability.\" }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        544,
+        -288
+      ],
+      "id": "9ea37567-0256-4cdc-a059-587d48cfae9a",
+      "name": "Booking Instructions"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ JSON.stringify({ request: $(\"Coordinator Instructions\").item.json.request, category: $json.text.trim(), handlerInstructions: \"You are an information assistant. Answer the user's general knowledge question briefly and clearly. Acknowledge uncertainty when you do not know the answer. Do not claim to have searched the web or checked live information. Do not ask questions or request additional details.\" }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        544,
+        -32
+      ],
+      "id": "2fbeb28b-5046-41c7-b92e-3af2e234bc99",
+      "name": "Info Instructions"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ JSON.stringify({ request: $(\"Coordinator Instructions\").item.json.request, category: $json.text.trim(), handlerInstructions: \"Reply only with: Your request was unclear. Do not ask questions or request additional details.\" }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        544,
+        224
+      ],
+      "id": "44d2475c-9d8d-4e49-9e1c-12bf1f03bbf3",
+      "name": "Unclear Instructions"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "059184cc-7d0e-45ab-bc15-7fa3b8fc361c",
+              "name": "message",
+              "value": "={{ String.fromCharCode(65279) + 'Response:\\n\\n' + $json.text + '\\n\\n— End of response —' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1328,
+        -32
+      ],
+      "id": "486c2941-67c3-4c1b-9d74-e7bb52e23ff1",
+      "name": "Format Final Response"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "message",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        -32
+      ],
+      "id": "68914a53-5edd-485a-937d-8103fb0ffa02",
+      "name": "Plain Text Response"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ '/files/output/output-' + $execution.id + '-' + ($runIndex + 1) + '.txt' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        1776,
+        -32
+      ],
+      "id": "20d85b89-47a9-4264-b097-770519f5b3c9",
+      "name": "Read/Write Files from Disk"
+    }
+  ],
+  "connections": {
+    "Execute Routing Example": {
+      "main": [
+        [
+          {
+            "node": "Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Requests": {
+      "main": [
+        [
+          {
+            "node": "Coordinator Instructions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coordinator Instructions": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Route by Request Category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Request Category": {
+      "main": [
+        [
+          {
+            "node": "Booking Instructions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Info Instructions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unclear Instructions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Handle Request",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Booking Instructions": {
+      "main": [
+        [
+          {
+            "node": "Handle Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Info Instructions": {
+      "main": [
+        [
+          {
+            "node": "Handle Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unclear Instructions": {
+      "main": [
+        [
+          {
+            "node": "Handle Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Request": {
+      "main": [
+        [
+          {
+            "node": "Format Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Final Response": {
+      "main": [
+        [
+          {
+            "node": "Plain Text Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plain Text Response": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "active": false,
+  "pinData": {}
+}
