@@ -2,7 +2,8 @@
 
 ## Ask before making changes
 
-- Always ask James Brannan before making any change, and wait for explicit approval before proceeding.
+- Never commit changes or push to GitHub unless the user explicitly asks for the respective action. Permission to create, edit, build, or test does not authorize committing or pushing. Permission to commit does not authorize pushing.
+- Always ask the user before making any change, and wait for explicit approval before proceeding.
 - An explicit instruction to create, edit, delete, or fix specified files or content is approval for that scope; do not ask for the same approval again. If the requested change or its scope is unclear, describe the proposed changes and ask before proceeding.
 - Describe the proposed changes and affected files before asking for approval.
 - Do not treat a request to discuss, review, investigate, or propose a design as permission to modify files.
@@ -40,10 +41,10 @@ The header requirements in this section apply only to newly created `.java` file
 Every newly created Java file must include a complete, readable Javadoc type header stating:
 
 - File: the actual filename, including its extension (for example, PdfDocumentService.java).
-- Author: James Brannan.
+- Author: the applicable project author.
 - Date: the creation date in YYYY-MM-DD format.
 - Description: a brief explanation of the file's purpose.
-- Copyright: the applicable year and James Brannan as copyright holder.
+- Copyright: the applicable year and project copyright holder.
 - License statement: explicitly state that the file is licensed under the MIT License, refer to the project-root LICENSE file for the full terms, and include SPDX-License-Identifier: MIT.
 
 Do not use an author-only comment or an abbreviated attribution in place of this header. Populate the filename, date, year, and description with actual values; do not leave template placeholders in created files.
@@ -61,11 +62,11 @@ Java header template:
  * Briefly describes the purpose and responsibility of this class.
  *
  * @file ClassName.java
- * @author James Brannan
+ * @author Project Author
  * @date YYYY-MM-DD
  * @version 0.0.1-SNAPSHOT
  * @since 0.0.1-SNAPSHOT
- * @copyright Copyright (c) YYYY James Brannan.
+ * @copyright Copyright (c) YYYY Project Copyright Holder.
  * @license MIT License. See LICENSE in the project root for the full terms.
  *          SPDX-License-Identifier: MIT
  */
