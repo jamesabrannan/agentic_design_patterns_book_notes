@@ -1,0 +1,21 @@
+
+# Local credentials
+/openai-key.txt
+.env
+.env.*
+!.env.example
+
+# Local n8n database, credentials, configuration, and files
+/storage/
+/.n8n/
+
+# Runtime logs and SQLite database files
+*.log
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Local backups
+*.zip
+*.bak
+*.tmp

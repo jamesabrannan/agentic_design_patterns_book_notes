@@ -1,0 +1,31 @@
+# Mapping Gulli's 21 patterns to n8n
+
+Use Antonio Gulli's *Agentic Design Patterns* as the theoretical textbook and implement each chapter using n8n rather than the Python frameworks used by Gulli.
+
+This is a suggested implementation mapping, rather than an official mapping published by n8n.
+
+| Chapter | Design pattern | Potential n8n implementation |
+|---:|---|---|
+| 1 | Prompt Chaining | Sequential LLM nodes |
+| 2 | Routing | Text Classifier, Switch, IF |
+| 3 | Parallelization | Concurrent tool calls or sub-workflows |
+| 4 | Reflection | Generator, evaluator, conditional loop |
+| 5 | Tool Use | AI Agent, attached tools, MCP |
+| 6 | Planning | Planning agent, structured output |
+| 7 | Multi-Agent Collaboration | AI Agent Tool, sub-workflows |
+| 8 | Memory Management | PostgreSQL, Redis, chat memory |
+| 9 | Learning and Adaptation | Persistent feedback and evaluation workflows |
+| 10 | Model Context Protocol | MCP Client and Server Trigger |
+| 11 | Goal Setting and Monitoring | Scheduled workflows, database state |
+| 12 | Exception Handling and Recovery | Error Trigger, retry, fallback |
+| 13 | Human-in-the-Loop | Approval nodes, Wait node |
+| 14 | Knowledge Retrieval (RAG) | Vector stores, embeddings, retrievers |
+| 15 | Inter-Agent Communication | Webhooks, APIs, sub-workflows |
+| 16 | Resource-Aware Optimization | Model selection, conditional branching |
+| 17 | Reasoning Techniques | Specialized prompts and iterative workflows |
+| 18 | Guardrails and Safety | Validation, scoped credentials, approval |
+| 19 | Evaluation and Monitoring | Evaluation nodes, execution history |
+| 20 | Prioritization | Structured scoring, sorting, routing |
+| 21 | Exploration and Discovery | Research agents, search tools, iterative loops |
+
+Some of the more advanced patterns would require custom code or external services; not every pattern has a dedicated n8n node.

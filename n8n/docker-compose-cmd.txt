@@ -1,0 +1,1 @@
+docker compose -p agentic-design-patterns-n8n up -d
