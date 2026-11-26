@@ -8,11 +8,12 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Agentic Design Patterns — Java Examples</name>
-  <description>Parent project for LangChain4j and OpenAI Java examples.</description>
+  <description>Parent project for LangChain4j, OpenAI, and Spring AI Java examples.</description>
 
   <modules>
     <module>langchain4j</module>
     <module>openai</module>
+    <module>agentic-design-patterns-springai</module>
   </modules>
 
   <properties>

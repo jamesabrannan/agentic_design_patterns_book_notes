@@ -20,10 +20,8 @@ These instructions apply to the Java examples under this directory.
 
 ## Java application logging
 
-- Keep logging minimal and messages concise. Log only useful workflow milestones or results needed to understand the demonstrated pattern.
 - Do not add logging to every class or method. Avoid constructor/accessor tracing, routine entry/exit logs, character counts, correlation IDs, and repeated exception logs unless specifically requested or necessary to explain the demo.
 - Use SLF4J backed by Log4j 2 with console output and parameterized messages. Do not add file logging or debugger-dependent logging configuration unless requested.
-- Do not log full prompts, response JSON, HTTP headers, or individual transport attempts unless the user specifically requests that diagnostic detail. Do not add shared HTTP logging infrastructure solely for a demo.
 - Never log passwords, API keys, Authorization headers, authentication or CSRF tokens, session cookies, SSNs, or sensitive personal information. Sanitize untrusted text to prevent forged log entries.
 - If detailed diagnostics are requested, use only non-sensitive sample data, keep prompt and response logs separate, and allowlist safe HTTP metadata. Never enable unrestricted HTTP wire logging or consume/change response bodies for logging.
 - Do not swallow exceptions or change application behavior solely to produce log entries. Logging does not authorize live model API calls or changes outside the approved scope.
