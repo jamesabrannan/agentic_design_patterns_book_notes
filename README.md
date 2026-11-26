@@ -2,7 +2,7 @@
 
 This repository is a work in progress containing personal study notes and code examples for *Agentic Design Patterns: A Hands-On Guide to Building Intelligent Systems* by Antonio Gulli.
 
-The collection currently includes **Python and Java** examples, with **C#** examples and **n8n workflows** planned, exploring how the book's patterns can be implemented across languages, frameworks, and workflow platforms. Examples and explanations will be added and revised as I work through the book.
+The collection currently includes **Python and Java** examples and **n8n workflows**, with **C#** examples planned, exploring how the book's patterns can be implemented across languages, frameworks, and workflow platforms. Examples and explanations will be added and revised as I work through the book.
 
 ## About the book
 
@@ -34,9 +34,15 @@ The [LangChain4j Maven project](java/langchain4j/pom.xml) contains the initial J
 
 The project targets Java 17. Running the example requires `OPENAI_API_KEY` in the process environment and makes live model requests. Booking is acknowledged rather than performed; the example does not connect to a booking service or live search.
 
-## n8n workflows (planned)
+## n8n workflows
 
-n8n workflows will demonstrate selected patterns from the book using visual workflow automation. Workflow examples and accompanying notes will be added as the project progresses.
+The n8n routing workflow classifies three sample requests, selects booking, information, or unclear-request instructions, and uses a shared LLM Chain to generate responses. Final nodes format each response, convert it to a text file, and save it to a Docker-mounted folder.
+
+- [Pattern mapping and routing walkthrough](n8n/mapping-patterns-to-n8n.md): node configuration, workflow JSON, screenshot, flow diagram, and Docker output paths.
+- [Importable routing workflow](n8n/workflows/routing-example-workflow.json): select your own OpenAI credentials after importing.
+- [Docker Compose configuration](n8n/compose.yml): local n8n service and storage mounts.
+
+Running the workflow makes live OpenAI requests. Booking is acknowledged rather than performed; the workflow does not make reservations or perform live searches. Additional workflows and notes will be added as the project progresses.
 
 ## Attribution and Codex assistance
 
