@@ -2,7 +2,7 @@
 
 This repository is a work in progress containing personal study notes and code examples for *Agentic Design Patterns: A Hands-On Guide to Building Intelligent Systems* by Antonio Gulli.
 
-The collection currently includes **Java (langchain4, openapi-java, Spring AI** and **n8n workflows**, exploring how the book's patterns can be implemented across languages, frameworks, and workflow platforms. Examples and explanations will be added and revised as I work through the book.
+The collection currently includes **Java (langchain4, openapi-java, Spring AI)** and **n8n workflows**, exploring how the book's patterns can be implemented across languages, frameworks, and workflow platforms. Examples and explanations will be added and revised as I work through the book.
 
 ## About the book
 
