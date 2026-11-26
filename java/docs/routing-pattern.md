@@ -1,4 +1,4 @@
-# Chapter 2: Routing with LangChain4j and OpenAI
+# Routing with LangChain4j, OpenAI, and Spring AI
 
 ## The routing pattern
 
@@ -6,7 +6,7 @@ Routing classifies an incoming request and directs it to specialized processing.
 
 > **Note:** The “Workflow: Routing” section of Anthropic's [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) explains classification and routing to specialized processing, with a diagram, use cases, and examples.
 
-These notes describe a LangChain4j conditional workflow and an explicit workflow using the official OpenAI Java SDK. Both separate classification from execution. No builds or live API requests were performed for this documentation update.
+These notes describe a LangChain4j conditional workflow, an explicit workflow using the official OpenAI Java SDK, and a Spring Boot workflow using Spring AI. All three separate classification from execution. No builds or live API requests were performed for this documentation update.
 
 ## Part 1: Routing with LangChain4j
 
@@ -300,7 +300,7 @@ Run `RoutingExample` as a Java Application in Eclipse, with `OPENAI_API_KEY` ava
 
 The owning Maven project targets Java 17 and includes `langchain4j`, `langchain4j-open-ai`, and `langchain4j-agentic`. The agentic module has a beta version and its APIs may evolve. Logging uses SLF4J bridged to Log4j 2.
 
-Logging should remain concise under the current `java/AGENTS.md` guidance. Extensive method tracing, full payload logs, and per-attempt HTTP logging infrastructure are not required for this learning demo.
+Logging uses SLF4J with Log4j 2 console output. The Spring AI implementation in Part 3 intentionally includes detailed application tracing requested for this learning demo.
 
 Other limits are intentional or remain unresolved:
 
@@ -607,6 +607,241 @@ Logs show each request, its category, the selected handler's milestone, and the 
 This is a learning demo with minimal exception handling. There is no real booking, live retrieval, conversation loop, custom retry policy, or fallback classification. SDK failures propagate; unsuccessful, refused, and empty responses fail the service's checks; unexpected category text fails enum conversion. Successful compilation does not verify model answers or classifications.
 
 The user supplied Maven installation output showing the module JAR was built and installed locally. That does not establish an end-to-end model run. No build, unit tests, or live API calls were performed for this documentation update.
+
+## Part 3: Routing with Spring AI
+
+### What this example demonstrates
+
+The [Spring AI Maven module](../agentic-design-patterns-springai/pom.xml), `agentic-design-patterns-springai`, implements the same three-category scenario using Spring Boot dependency injection, a shared Spring AI `ChatClient`, and explicit Java orchestration.
+
+The application runs the same three sample requests shown in Parts 1 and 2. Each successful request normally makes two model calls: the coordinator classifies the request, and the selected handler generates the answer. Three samples normally require six calls, excluding retries. All three handlers, including the fixed-wording unclear branch, remain model-backed.
+
+Unlike the direct SDK example, handler selection belongs to `CoordinatorAgent`, rather than the entry point. `RoutingExampleService` supplies samples and displays results; it does not classify requests or choose handlers. Spring supplies object construction and injection, while handwritten Java defines the routing workflow.
+
+### Flow diagram
+
+```mermaid
+flowchart TD
+    A[Start AgenticpatternsApplication] --> B[Spring creates shared ChatClient and application beans]
+    B --> C[CommandLineRunner.run receives arguments]
+    C --> D{First argument is ROUTING?}
+    D -->|No| E[Log usage guidance]
+    D -->|Yes| F[RoutingExampleService.runExample]
+    F --> G[Take next sample request]
+    G --> H[CoordinatorAgent.handleRequest]
+    H --> I[Model classifies request using coordinator instructions]
+    I --> J[Check text and convert to RequestCategory]
+    J --> K{Private routeRequest switch}
+    K -->|BOOKING| L[BookingHandler.handle]
+    K -->|INFO| M[InfoHandler.handle]
+    K -->|UNCLEAR| N[UnclearHandler.handle]
+    L --> O[Model answers using selected handler instructions]
+    M --> O
+    N --> O
+    O --> P[Return answer through coordinator to service]
+    P --> Q[Log prominent request and response block]
+    Q --> R{More samples?}
+    R -->|Yes| G
+    R -->|No| S[Runner finishes]
+```
+
+This shows successful processing. API failures or invalid classification output interrupt the sample loop; there is no recovery or automatic fallback to `UNCLEAR`. Constructing the beans does not itself submit model requests.
+
+### Class and dependency diagram
+
+```mermaid
+classDiagram
+    class AgenticpatternsApplication {
+        +main(String[] args) void
+        +run(String... args) void
+    }
+    class CommandLineRunner {
+        <<Spring Boot interface>>
+    }
+    class RoutingExampleService {
+        +runExample() void
+    }
+    class ChatClientConfig {
+        +routingChatClient(ChatClient.Builder builder) ChatClient
+    }
+    class ChatClient {
+        <<Spring AI interface>>
+    }
+    class CoordinatorAgent {
+        +handleRequest(String request) String
+        -routeRequest(RequestCategory category, String request) String
+    }
+    class RequestCategory {
+        <<enumeration>>
+        BOOKING
+        INFO
+        UNCLEAR
+    }
+    class RequestHandler {
+        <<abstract>>
+        #chatClient : ChatClient
+        +handle(String request) String
+    }
+    class BookingHandler {
+        +handle(String request) String
+    }
+    class InfoHandler {
+        +handle(String request) String
+    }
+    class UnclearHandler {
+        +handle(String request) String
+    }
+    AgenticpatternsApplication ..|> CommandLineRunner
+    AgenticpatternsApplication --> RoutingExampleService : injected
+    RoutingExampleService --> CoordinatorAgent : injected
+    ChatClientConfig ..> ChatClient : builds shared bean
+    CoordinatorAgent --> ChatClient : injected
+    CoordinatorAgent ..> RequestCategory : parses classification
+    CoordinatorAgent --> BookingHandler : injected and selected
+    CoordinatorAgent --> InfoHandler : injected and selected
+    CoordinatorAgent --> UnclearHandler : injected and selected
+    RequestHandler --> ChatClient : shared reference
+    BookingHandler --|> RequestHandler
+    InfoHandler --|> RequestHandler
+    UnclearHandler --|> RequestHandler
+```
+
+Inheritance arrows show that handlers extend an abstract class, rather than implement the interface used by the direct SDK example. Each concrete handler receives the same `ChatClient` bean through its constructor and passes it to `super(chatClient)`.
+
+### 1. Configuration and the shared ChatClient
+
+[application.properties](../agentic-design-patterns-springai/src/main/resources/application.properties) references the process environment:
+
+```properties
+spring.application.name=agenticpatterns
+spring.ai.openai.api-key=${OPENAI_API_KEY}
+```
+
+The key value is not stored in source. The current file does not explicitly select a model; model selection is left to the configured Spring AI provider defaults unless overridden externally. To make the model selection explicit, a reader can configure `spring.ai.openai.chat.options.model`; this example currently does not set it.
+
+[ChatClientConfig](../agentic-design-patterns-springai/src/main/java/com/jamesabrannan/springai/agenticpatterns/config/ChatClientConfig.java) uses `@Configuration` and a `@Bean` method:
+
+```java
+@Bean
+public ChatClient routingChatClient(ChatClient.Builder builder) {
+    logger.debug("Creating shared routing ChatClient");
+    ChatClient chatClient = builder.build();
+    logger.debug("Shared routing ChatClient ready for injection");
+    return chatClient;
+}
+```
+
+Spring AI supplies the configured builder. The method builds one shared bean for the coordinator and handlers. Each call creates its own prompt; sharing this client does not combine system instructions or automatically share conversation history.
+
+`RoutingExampleService` uses `@Service`; the coordinator and three concrete handlers use `@Component`. They are Spring-managed objects registered through component scanning. The abstract handler and enum are ordinary Java types. Single-constructor injection needs no `@Autowired` annotation, and dependency references are `final`.
+
+### 2. Application startup and the example service
+
+[AgenticpatternsApplication](../agentic-design-patterns-springai/src/main/java/com/jamesabrannan/springai/agenticpatterns/AgenticpatternsApplication.java) implements `CommandLineRunner`. Its `main()` starts Spring Boot; Spring invokes `run(String... args)` after initialization:
+
+```java
+@Override
+public void run(String... args) {
+    logger.debug("Selecting example from {} command-line arguments", args.length);
+    if (args.length > 0 && "ROUTING".equalsIgnoreCase(args[0])) {
+        logger.debug("Running routing example");
+        routingExampleService.runExample();
+        logger.debug("Routing example finished");
+    } else {
+        logger.info("No supported example selected; use ROUTING");
+    }
+}
+```
+
+The service is injected rather than retrieved manually with `context.getBean()`. `SpringApplication.run()` invokes the runner before returning, so the log following it in `main()` appears after sample processing finishes.
+
+[RoutingExampleService](../agentic-design-patterns-springai/src/main/java/com/jamesabrannan/springai/agenticpatterns/routing/service/RoutingExampleService.java) stores the samples in an immutable `List.of(...)`. Its loop calls `coordinator.handleRequest(request)` and logs the returned answer in an INFO block with separators, request text, and response text. The response is a local variable, not shared service state. Processing is sequential.
+
+### 3. CoordinatorAgent: classification and enum conversion
+
+[CoordinatorAgent](../agentic-design-patterns-springai/src/main/java/com/jamesabrannan/springai/agenticpatterns/routing/CoordinatorAgent.java) owns both classification and delegation. Its first model call is:
+
+```java
+String requestType = chatClient.prompt()
+        .system(INSTRUCTIONS)
+        .user(request)
+        .call()
+        .content();
+```
+
+| Expression | Responsibility |
+| --- | --- |
+| `.prompt()` | Starts a new prompt specification. |
+| `.system(INSTRUCTIONS)` | Supplies classification rules and requests only a category name. |
+| `.user(request)` | Supplies the original question or travel request. |
+| `.call()` | Executes the synchronous model interaction. |
+| `.content()` | Returns generated message text, rather than the complete provider response envelope. |
+
+The provider's HTTP response is JSON, but Spring AI handles that envelope. A model message containing `BOOKING` becomes the string `"BOOKING"`; the application does not need to parse the surrounding transport JSON. If the instructions instead requested a JSON object, that generated content would require corresponding parsing or structured conversion.
+
+The coordinator rejects null or blank classification text, then uses `RequestCategory.valueOf(requestType.trim())`. Matching is strict and case-sensitive. Invalid text is reported as an `IllegalStateException` with classification context, preserving the conversion exception as its cause. It does not silently turn failed classification into an unclear request.
+
+[RequestCategory](../agentic-design-patterns-springai/src/main/java/com/jamesabrannan/springai/agenticpatterns/routing/handlers/RequestCategory.java) defines `BOOKING`, `INFO`, and `UNCLEAR`. Its static initializer logs the available categories when the enum is initialized; the enum makes no model calls.
+
+### 4. Selecting a handler inside the coordinator
+
+After conversion, `handleRequest()` calls this private method and returns the selected handler's result:
+
+```java
+private String routeRequest(RequestCategory requestCategory, String request) {
+    logger.debug("Routing request to {} handler", requestCategory);
+    return switch (requestCategory) {
+        case INFO -> infoHandler.handle(request);
+        case BOOKING -> bookingHandler.handle(request);
+        case UNCLEAR -> unclearHandler.handle(request);
+    };
+}
+```
+
+This Java 17 switch expression covers every current enum constant without a default branch. Adding a category requires updating the exhaustive switch when recompiling. Selection is Java control flow; Spring AI supplies the model call, not a conditional workflow builder.
+
+The service does not need to know which handler ran. The return path is handler to coordinator to service, with the final answer carried as a `String`.
+
+### 5. The abstract handler and specialized prompts
+
+[RequestHandler](../agentic-design-patterns-springai/src/main/java/com/jamesabrannan/springai/agenticpatterns/routing/handlers/RequestHandler.java) holds a `protected final ChatClient` and declares `public abstract String handle(String request)`. Its constructor stores the client and logs the concrete handler type. It does not implement a shared model-call method; each subclass defines its own execution explicitly.
+
+| Class | Instructions |
+| --- | --- |
+| [BookingHandler](../agentic-design-patterns-springai/src/main/java/com/jamesabrannan/springai/agenticpatterns/routing/handlers/BookingHandler.java) | Briefly acknowledge travel requests without follow-up questions or claims of bookings or live availability checks. |
+| [InfoHandler](../agentic-design-patterns-springai/src/main/java/com/jamesabrannan/springai/agenticpatterns/routing/handlers/InfoHandler.java) | Briefly answer general knowledge questions, acknowledge uncertainty, and avoid live-search claims or follow-up questions. |
+| [UnclearHandler](../agentic-design-patterns-springai/src/main/java/com/jamesabrannan/springai/agenticpatterns/routing/handlers/UnclearHandler.java) | Reply only `Your request was unclear.` without questions. |
+
+Each handler uses the same call sequence as the coordinator, but with its own `INSTRUCTIONS`. Both calls need `.user(request)`: the coordinator classifies the original request, and the selected handler answers that same request in a separate model interaction. The handler does not automatically inherit messages from the classifier.
+
+There are no booking tools, web searches, or external business actions. The unclear handler deliberately makes a model call despite requesting fixed wording. Prompts influence behavior but do not guarantee an exact answer.
+
+### 6. Comparison with the other Java examples
+
+| Concern | LangChain4j | Direct OpenAI SDK | Spring AI |
+| --- | --- | --- | --- |
+| Model access | `OpenAiChatModel`. | SDK client through `OpenAiTextService`. | Shared `ChatClient` bean. |
+| Object construction | Framework-generated agent implementations. | Explicit constructors in `main()`. | Spring configuration and component scanning. |
+| Prompt definition | Annotated interfaces. | Instructions and input passed to text service. | `.system(...)` and `.user(...)` per call. |
+| Category conversion | Framework returns enum. | Explicit string-to-enum conversion. | Explicit string-to-enum conversion with contextual failure messages. |
+| Handler selection | Conditional workflow predicates. | Switch in `RoutingExample`. | Private switch in `CoordinatorAgent`. |
+| Handler contract | Interfaces with generated implementations. | Classes implementing an interface. | Classes extending an abstract base. |
+| Demo entry point | Java `main()`. | Java `main()`. | Spring Boot `CommandLineRunner`. |
+| Normal calls per request | Two. | Two. | Two. |
+
+The Spring AI version remains explicit about orchestration. Dependency injection simplifies wiring, while the coordinator ties classification and handler execution together in ordinary Java.
+
+### 7. Running, logging, and current limitations
+
+Run `com.jamesabrannan.springai.agenticpatterns.AgenticpatternsApplication` in Eclipse with `ROUTING` in **Program arguments** and `OPENAI_API_KEY` available in the launch environment. Argument matching is case-insensitive. Missing or unsupported arguments display guidance rather than process samples. Executing the routing example sends live model requests.
+
+The module POM declares Java 17, Spring Boot `4.2.0`, and Spring AI `2.1.0-M1`. It includes the OpenAI model starter and Log4j 2 starter; Spring Shell is not required or included. These are the versions declared by this source, rather than recommendations to upgrade to them.
+
+[log4j2-spring.xml](../agentic-design-patterns-springai/src/main/resources/log4j2-spring.xml) enables DEBUG for `com.jamesabrannan.springai.agenticpatterns` and INFO for the root logger. Application logs show bean initialization, classification, category conversion, delegation, and completion. INFO blocks make each sample request and answer prominent. Credentials and raw HTTP payloads are not logged. This detailed tracing is intentional for the learning demo.
+
+API failures and classification errors propagate and stop later samples. Unlike the direct SDK text service, the handlers do not add explicit completion, refusal, or blank-answer validation around `.content()`. The example has no conversation memory, real booking, live retrieval, or custom recovery workflow.
+
+The user reported that the example runs successfully. This section was checked against the current source; no build, unit tests, or live API requests were performed for this documentation update.
 
 ## Design alternative: structured JSON classification
 

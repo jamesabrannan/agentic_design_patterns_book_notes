@@ -1,4 +1,4 @@
-# Chapter 2: Routing workflow
+# Routing workflow
 
 The `Routing-Example-Workflow` implements the same booking, information, and unclear-request scenario as the [Java routing examples](../java/docs/routing-pattern.md). An LLM classifies each request, a Switch selects a branch, and a second LLM call generates a response using the selected branch's instructions. The final nodes format the response, convert it to a text file, and write it to a Docker-mounted Windows folder.
 

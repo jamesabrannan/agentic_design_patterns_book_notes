@@ -1,6 +1,6 @@
 > **Note:** The notebook contains a LangChain routing pipeline and a direct OpenAI Python SDK alternative. It does not define a LangGraph graph.
 
-# Chapter 02: Routing with LangChain and OpenAI — Notes
+# Routing with LangChain and OpenAI — Notes
 
 > **Note:** The “Workflow: Routing” section of Anthropic's [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) explains how requests are classified and directed to specialized handlers, with a diagram, use cases, and examples.
 
